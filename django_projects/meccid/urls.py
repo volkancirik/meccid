@@ -46,5 +46,6 @@ urlpatterns = patterns('',
     (r'^new_post_save/$', 'meccid.blog.views.new_post_save'),
     (r'^export/$', 'meccid.blog.views.exportToFile'),
     (r'^updatet/$', 'meccid.blog.views.updateTagToTags'),
+    (r'^test/$', 'meccid.blog.views.main_view'),
     url(r'^$', 'meccid.blog.views.main_view'), # Should be the last element.
 )
