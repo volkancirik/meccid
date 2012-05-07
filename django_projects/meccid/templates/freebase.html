@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block baslik%} FREEBASE {% endblock %}
+
+{% block icerik %}<h1> FREEBASE </h1>
+{#<input type="text" id="myinput"/>#}
+  <hr>
+
+          <form method="post" action="/sparql/">{% csrf_token %}
+
+            <p><label >Keyword:</label>
+                <input type="text" id="myinput" name="keyword" maxlength="100" /> </p>
+                <input type="submit" value="Save Page">{% csrf_token %}
+{#                <input type="text" id="topic" /><input type="text" id="topic" />#}
+{#                <input type="hidden" id="topic_id" />#}
+{#                <input type="hidden" id="topic_name" />#}
+{#                <input type="submit" />#}
+   
+        </form>
+
+
+
+</form>
+
+<hr>
+    <span id="returnValueOfFreebase"></span>
+<hr>
+{% for res in list %}
+   <li> {{ res }}</li>
+{% endfor %}
+
+    {{ text }}
+
+{%endblock  %}

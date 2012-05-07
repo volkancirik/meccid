@@ -1,0 +1,102 @@
+{% load comments %}
+{% load threadedcomments_tags %}
+
+<html>
+<head><title>{{ post.title }}</title>
+<script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.1.js"></script>
+<script type="text/javascript">
+function show_reply_form(comment_id, url, person_name) {
+    var comment_reply = $('#' + comment_id);
+    var to_add = $( new Array(
+    '<div class="response"><p>Reply to ' + person_name + ':</p>',
+    '<form method="POST" action="' + url + '">',
+    '<ul>',  '{{ form }}',
+    '<li><input type="submit" value="Submit Comment" /></li>',
+    '</ul>', '</form>','</div>').join(''));
+    to_add.css("display", "none");
+    comment_reply.after(to_add);
+    to_add.slideDown(function() {
+        comment_reply.replaceWith(new Array('<a id="',
+        comment_id,'" href="javascript:hide_reply_form(\'',
+        comment_id, '\',\'', url, '\',\'', person_name,
+        '\')">Stop Replying</a>').join(''));
+    });
+}
+function hide_reply_form(comment_id, url, person_name) {
+    var comment_reply = $('#' + comment_id);
+    comment_reply.next().slideUp(function (){
+        comment_reply.next('.response').remove();
+        comment_reply.replaceWith(new Array('<a id="',
+        comment_id,'" href="javascript:show_reply_form(\'',
+        comment_id, '\',\'', url, '\',\'', person_name,
+        '\')">Reply</a>').join(''));
+    });
+}
+
+
+</script>
+<style type="text/css">
+html { background-color: #757575; }
+a { color: #000000; font-size: 80%; }
+.comment { border-left: 2px solid #505050; padding-left: 2px;
+    margin-bottom: 4px; background-color: #999999; color: #000000; }
+#blogpost { background-color: #505050; padding-top: 4px;
+    padding-bottom: 3px; }
+#blogpost h1 { background-color: #808080; margin: 4px 4px 4px 4px; }
+</style>
+</head>
+<body>
+    <div id="blogpost">
+        <h3>{{ post.title }} | Posted On: {{ post.date_posted|date }}</h3>
+        {{ post.body|linebreaks }}
+    </div>
+    <h3>Comments on This Post:</h3>
+    {% for comment in base|fill_tree|annotate_tree %}
+        {% if comment != base|first  %}
+
+        <div style="margin-left: {{ comment.depth }}em;" class="comment">
+            {{ comment.name }} said:<br/>
+            {{ comment.comment }}
+            
+            <a href="/blog/{{ comment.comment_ptr_id }}/">Reply to this</a>
+           
+            <a id="{{ comment.comment_ptr_id }}" href="javascript:show_reply_form('c{{ comment.comment_ptr_id }}','/comments/post','{{ comment.title }}')">ReplyJS</a>
+        </div>
+    {% endif %}
+    {% endfor %}
+    <hr>
+
+        <p>Replying to original:</p>
+            <table>
+
+    <form method="POST" action="{% comment_form_target %}" >{% csrf_token %}
+            {% get_comment_form for post as form with post.baseThreadID  %}
+
+            {% for field in form %}
+             {% if  field.name == 'name'  or field.name == 'comment' or field.name == 'title' %}
+                 {{ field.name }}{{ field }}
+             {% endif %}
+             {% for hidden in form.hidden_fields %}
+                 {{ hidden }}
+            {% endfor %}
+
+
+            {% endfor %}
+
+
+        <tr>
+        <td colspan="2">
+            <input type="submit" name="submit" value="Post">{% csrf_token %}
+            <input type="submit" name="preview" value="Preview">{% csrf_token %}
+        </td>
+        </tr>
+    </form>
+    </table>
+
+
+
+
+
+</body>
+</html>
+

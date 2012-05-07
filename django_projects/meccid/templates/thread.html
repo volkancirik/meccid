@@ -1,0 +1,21 @@
+{% load comments %}
+{% load threadedcomments_tags %}
+
+<html>
+<head><title> Comments </title> </head>
+<body>
+<h1>Comments </h1>
+
+<h2>Tree Structure </h2>
+
+<hr>
+{% for comment in post %}
+    <li>{{ comment.title }}/{{ comment.name }}________ {{ comment.tree_path }} ___ {{ comment.comment_ptr_id }}</li>
+{% endfor %}
+<hr>
+
+</body>
+</html>
+
+</body>
+</html>

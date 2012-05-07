@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block baslik %}
+    Register
+{% endblock %}
+{% block icerik %}
+<form method="post" action="" style="position: absolute;top:40px;">
+{#    {{ formset }}#}
+ <table>
+{#    {% for field in formset %}#}
+{#      <tr>#}
+{#         <td> {{ field.name }}</td>#}
+{#         <td>{{ field }} </td>#}
+{#     </tr>#}
+{#    {% endfor %}#}
+     {{ formset }}
+      <tr>
+          <td>
+             <input type="submit" name="submit" value="Register" style="position:absolute;left: 145px;">{% csrf_token %}
+          </td>
+       </tr>
+ </table>
+
+</form>
+{% endblock %}

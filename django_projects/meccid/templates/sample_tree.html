@@ -1,0 +1,49 @@
+{% load threadedcomments_tags %}
+<html>
+<head><title> Comments </title> </head>
+<body>
+<h1>Comments </h1>
+
+
+<h2>Tree Structure </h2>
+
+{% for comment in post|fill_tree|annotate_tree %}
+    <hr>
+    <li>{{ comment.comment }}</li>
+    <li>{{ comment.tree_path }}</li>
+    {% ifchanged comment.parent_id %}
+
+    {% else %}
+
+    {% endifchanged %}
+
+    {% ifchanged comment.parent_id %}
+
+    {% else %}
+
+    {% endifchanged %}
+
+    {% if not comment.open and not comment.close %}
+    
+    {% endif %}
+
+    {% if comment.open %}
+{#    <ul>#}
+    {% endif %}
+
+<li{% if comment.last %} class="last"{% endif %}></li>
+
+{{ comment.parent_id }}{% if comment.added_path %} ADDED {% endif %}
+
+{% for close in comment.close %}
+    
+    </ul>
+{% endfor %}
+
+{% endfor %}
+
+</body>
+</html>
+
+
+

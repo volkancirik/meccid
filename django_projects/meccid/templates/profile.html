@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load humanizeTimeDiff %}
+{% load voting_tags %}
+{% votes_by_user user on post as vote_dict %}
+{% scores_for_objects post as score_dict %}
+
+{% block baslik %}
+    Profile
+{% endblock %}
+
+{% block icerik %}
+        {% if error %}
+            There is no such user.
+        {% else %}
+        <div id="profileName" style="position: relative;top:25px; z-index: 1;">
+         <table>
+            <tr>
+                <td><b>Name :</b></td>
+                <td>{{ userInfo.user.username }}</td>
+{#                <td><b>e-mail :</b></td>#}
+{#                <td>{{ userInfo.user.email }}</td>#}
+                <td><b>Karma :</b></td>
+                <td>{{ userInfo.karma }}</td>
+            </tr>
+         </table>
+        </div>
+      <div id="postMenu" style="position: relative;padding-top: 0;">
+        <h3 style="padding-left: 20px;">Posts Related to This User</h3>
+        {% if result_count > -1 %} <span class="current">  {%if result_count %} {{ result_count }} {% else %} No {% endif %} item{% if result_count > 1 %}s{% endif %} found.  </span> {% endif %}
+   {% for aPost in post_pages.object_list %}
+        <div id="postMenuitem">
+            {% dict_entry_for_item aPost from vote_dict as vote %}
+            {% dict_entry_for_item aPost from score_dict as score %}
+            <table>
+                <tr>
+                    <td>
+
+                    </td>
+            <td>
+                <div style="color: #3E6D8E;font-weight: bolder;display:inline-block;text-align: center;font-size: 90%; text-decoration: none; white-space: nowrap;">
+                    {% if aPost.author.username == userInfo.user.username %}
+                    Posted :
+                    {% else %}
+                    Commented on This:
+                    {% endif %}
+                </div>
+                    <a id="titleLink" href="/blog/page/{{ aPost.id }}/">{{ aPost.title }} </a><a style="text-decoration:none;"href="/profile/{{ aPost.author }}/">{{aPost.author }} </a> <span id="postDetails"> <span style="padding-left: 10px; font-size: 80%;"> on : <b>{{ aPost.category }}</b> <i>{{ aPost.date_posted|humanizeTimeDiff }} ago </i></span>
+                    <b>{{ aPost.postNumComments }}</b> Comments <a id="postLink" href="/blog/page/{{ aPost.id }}/">Read More</a></span>
+            </td>
+             </tr>
+             </table>
+        </div>
+    {% endfor %}
+         <div class="pagination" style="padding-left: 20px;padding-top: 2px;padding-bottom: 2px;">
+            <span class="step-links">
+                {% if post_pages.has_previous %}
+                    <a href="?page={{ post_pages.previous_page_number }}">previous</a>
+                {% endif %}
+
+                <span class="current">
+                    Page {{ post_pages.number }} of {{ post_pages.paginator.num_pages }}.
+                </span>
+
+                {% if post_pages.has_next %}
+                    <a href="?page={{ post_pages.next_page_number }}">next</a>
+                {% endif %}
+            </span>
+    </div>
+    </div>
+
+
+    {% endif %}
+
+
+ {% endblock %}

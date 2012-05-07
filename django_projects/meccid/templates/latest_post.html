@@ -1,0 +1,166 @@
+{% load comments %}
+{% load threadedcomments_tags %}
+
+{% load voting_tags %}
+{% votes_by_user user on base as vote_dict %}
+{% scores_for_objects base as score_dict %}
+
+<html>
+<head><title>{{ post.title }}</title>
+<script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.2.1.js"></script>
+<script type="text/javascript">
+    
+function show_reply_form(comment_id, url, person_name) {
+    var comment_reply = $('#' + comment_id);
+    var to_add = $( new Array(
+    '<div class="response"><p>Reply to ' + person_name + ':</p>',
+    '<form method="POST" action="'+url+'">','{{ form  }}','<li><input type="submit" value="Submit Comment"/></li>','</form>',
+    '</div>').join(''));
+    to_add.css("display", "none");
+    comment_reply.after(to_add);
+    to_add.slideDown(function() {
+        comment_reply.replaceWith(new Array('<a id="',
+        comment_id,'" href="javascript:hide_reply_form(\'',
+        comment_id, '\',\'', url, '\',\'', person_name,
+        '\')">Stop Replying</a>').join(''));
+    });
+}
+function hide_reply_form(comment_id, url, person_name) {
+    var comment_reply = $('#' + comment_id);
+    comment_reply.next().slideUp(function (){
+        comment_reply.next('.response').remove();
+        comment_reply.replaceWith(new Array('<a id="',
+        comment_id,'" href="javascript:show_reply_form(\'',
+        comment_id, '\',\'', url, '\',\'', person_name,
+        '\')">Reply</a>').join(''));
+    });
+}
+</script>
+<style type="text/css">
+html { background-color: #898989; }
+a { color: #000000; font-size: 80%; }
+.comment { border-left: 2px solid #505050; padding-left: 2px;
+    margin-bottom: 4px; background-color: #999999; color: #000000; }
+#blogpost { background-color: #505050; padding-top: 4px;
+    padding-bottom: 3px; }
+#blogpost h1 { background-color: #808080; margin: 4px 4px 4px 4px; }
+</style>
+</head>
+<body>
+    <div id="blogpost">
+        <h3>{{ post.title }} | Posted On: {{ post.date_posted|date }}</h3>
+        {{ post.body|linebreaks }}
+    </div>
+    <h3>Comments on This Post:</h3>
+    {% for comment in base|fill_tree|annotate_tree %}
+        {% if comment != base|first  %}
+{#           <p class="details">#}
+{#           <span class="score" id="linkscore{{ comment.comment_ptr_id }}"#}
+{#              title="after {{ score.num_votes|default:0 }} vote{{ score.num_votes|default:0|pluralize }}">#}
+{#             {{ score.score|default:0 }} point{{ score.score|default:0|pluralize }}#}
+{#            </span>#}
+{#            id="linkuparrow{{ comment.comment_ptr_id  }}#}
+{#             </p>#}
+        <div style="margin-left: {{ comment.depth }}em;" class="comment">
+            {% dict_entry_for_item comment from vote_dict as vote %}
+            {% dict_entry_for_item comment from score_dict as score %}
+
+            <table>
+                <tr>
+                    <td>
+                <form class="linkvote" id="linkup{{ comment.comment_ptr_id }}" action="{{ comment.comment_ptr_id}}/{% if vote and vote.is_upvote %}clear{% else %}up{% endif %}vote/" method="POST">
+                <input type="image" id="linkuparrow{{ comment.comment_ptr_id  }}" src= "{{ MEDIA_URL }}aup{% if vote and vote.is_upvote %}mod{% else %}grey{% endif %}.png">
+                </form>
+
+            <form class="linkvote" id="linkdown{{ comment.comment_ptr_id  }}" action="{{comment.comment_ptr_id}}/{% if vote and vote.is_downvote %}clear{% else %}down{% endif %}vote/" method="POST">
+             <input type="image" id="linkdownarrow{{ comment.comment_ptr_id  }}" src= "{{ MEDIA_URL }}adown{% if vote and vote.is_downvote %}mod{% else %}grey{% endif %}.png">
+            </form></td>
+            <td>
+            <span class="score" id="linkscore{{ comment.comment_ptr_id }}"
+              title="after {{ score.num_votes|default:0 }} vote{{ score.num_votes|default:0|pluralize }}">
+             {{ score.score|default:0 }} point{{ score.score|default:0|pluralize }}
+            </span>
+
+            {{ comment.name }} said:<br/>
+            {{ comment.comment }}
+            <a href="/blog/{{ post.title }}/{{ comment.comment_ptr_id }}/">Reply to this</a>
+            </td>
+             </tr>
+             </table>
+{#             {% render_comment_form for comment with comment.comment_ptr_id %}#}
+{#            <a id="c{{ comment.id }}" href="javascript:show_reply_form('c{{ comment.comment_ptr_id }}','/comments/post/','{{ comment.title }}')">Reply</a>#}
+        </div>
+    {% endif %}
+    {% endfor %}
+    <hr>
+
+{% if reply %}
+   You are replying <b>{{ reply.name}}</b>'s Comment :
+        {{ reply.comment }}
+        <hr>
+        <table>
+           <form method="POST" action="{% comment_form_target %}" >{% csrf_token %}
+               {% get_comment_form for reply as form with reply.comment_ptr_id %}
+               {% for field in form %}
+                  {% if  field.name == 'name'  or field.name == 'comment'%}
+                     <tr>
+                       <td> {{ field.name }}</td>
+                       <td>{{ field }} </td>
+                     </tr>
+                  {% endif %}
+               {% endfor %}
+
+               {% for hidden in form.hidden_fields %}
+                 {{ hidden }}
+               {% endfor %}
+
+                <tr>
+                  <td></td>
+                  <td>
+                     <input type="submit" name="submit" value="Post">{% csrf_token %}
+                     <input type="submit" name="preview" value="Preview">{% csrf_token %}
+                 </td>
+                </tr>
+         </form>
+        </table>
+
+{% else %}
+   <p>Replying to original:</p>
+
+  {% with baslangic=base|first  %}
+  <table>
+    <form method="POST" action="{% comment_form_target %}" >{% csrf_token %}
+           {% get_comment_form for baslangic as form with baslangic.comment_ptr_id %}
+
+           {% for field in form %}
+             {% if  field.name == 'name'  or field.name == 'comment'%}
+                <tr>
+                   <td> {{ field.name }}</td>
+                   <td>{{ field }} </td>
+                </tr>
+             {% endif %}
+
+             {% for hidden in form.hidden_fields %}
+                 {{ hidden }}
+             {% endfor %}
+           {% endfor %}
+
+        <tr>
+            <td></td>
+            <td>
+                 <input type="submit" name="submit" value="Post">{% csrf_token %}
+                 <input type="submit" name="preview" value="Preview">{% csrf_token %}
+            </td>
+        </tr>
+    </form>
+  </table>
+  {% endwith %}
+
+{% endif %}
+
+
+
+
+</body>
+</html>
+

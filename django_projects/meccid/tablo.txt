@@ -1,0 +1,10 @@
+BEGIN;
+CREATE TABLE "threadedcomments_comment" (
+    "comment_ptr_id" integer NOT NULL PRIMARY KEY REFERENCES "django_comments" ("id"),
+    "title" text NOT NULL,
+    "parent_id" integer,
+    "last_child_id" integer,
+    "tree_path" text NOT NULL
+)
+;
+COMMIT;

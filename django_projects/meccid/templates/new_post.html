@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block baslik%} New post {% endblock %}
+
+{% block icerik %}
+        <div id="readPost" style="position: relative;top:30px;">
+        <form id="postform" method="post" action="/new_post_save/">{% csrf_token %}
+            <label style="color: #3E6D8E;font-weight: bolder;display:inline-block;text-align: center;font-size: 110%; text-decoration: none; white-space: nowrap;font-weight: bolder;">
+                Your Title</label><br>
+                <input class="createTitle" style="border: 1px solid #3E6D8E;border-radius: 7px 7px 7px 7px;" type="text" name="page_name" maxlength="100" /><br>
+            <label style="color: #3E6D8E;font-weight: bolder;display:inline-block;text-align: center;font-size: 110%; text-decoration: none; white-space: nowrap;font-weight: bolder;">
+                Your Description</label><br>
+            <textarea  class="createTitle" style="border: 1px solid #3E6D8E;border-radius: 7px 7px 7px 7px;" name="content" rows="20" cols="60"></textarea>{% csrf_token %}<br />
+
+            <div style="border: 1px solid #3E6D8E;width: 350px;padding-bottom: 5px;padding-left: 5px; padding-right: 15px; border-radius: 7px 7px 7px 7px;">
+                    <label style="color: #3E6D8E;font-weight: bolder;display:inline-block;text-align: center;font-size: 110%; text-decoration: none; white-space: nowrap;font-weight: bolder;">
+                        Choose a Category</label><br>
+
+                    <input type="radio" name="cat" value="other" checked/>{% csrf_token %}other
+                    <input type="radio" name="cat" value="til" />{% csrf_token %}today I learned
+                    <input type="radio" name="cat" value="self" />{% csrf_token %}Self ask
+                    <input type="radio" name="cat" value="politics" />{% csrf_token %}politics<br>
+             </div>
+            <label style="padding-top: 5px;padding-right:5px;color: #3E6D8E;font-weight: bolder;display:inline-block;text-align: center;font-size: 110%; text-decoration: none; white-space: nowrap;font-weight: bolder;">
+                Add your tags : </label><input type="text" style="border: 1px solid #3E6D8E;border-radius: 3px 3px 3px 3px;" id="tagblock" name="keyword" maxlength="100" />{% csrf_token %}
+            <span type="hidden" id="tags"></span><br>
+            <input id="newPostBox" type="submit" value="Create This Post!">{% csrf_token %}
+        </form>
+        </div>
+
+{%endblock  %}
+

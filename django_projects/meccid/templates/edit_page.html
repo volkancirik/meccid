@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block baslik%} {{page_name }} - Editing {% endblock %}
+
+{% block icerik %}<h1> Editing {{ page_name }} </h1>
+        <form method="post" action="/blog/{{ page_name }}/save/">{% csrf_token %}
+            <textarea name="content" rows="20" cols="60">{{ content }}</textarea>{% csrf_token %}<br />
+            <input type="radio" name="tag" value="til" />{% csrf_token %}today I learned
+            <input type="radio" name="tag" value="self" />{% csrf_token %}Self ask
+            <input type="radio" name="tag" value="self" />{% csrf_token %}politics<br />
+            <input type="submit" value="Save Page">{% csrf_token %}
+        </form>
+
+{%endblock  %}
+

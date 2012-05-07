@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block icerik %}
+{% load comments %}
+{% load threadedcomments_tags %}
+{% load humanizeTimeDiff %}
+    
+{% load voting_tags %}
+{% votes_by_user user on post as vote_dict %}
+{% scores_for_objects post as score_dict %}
+<div id="filterMenu">
+<label style="color: #1E4D6E;display: inline-block;font-size: 90%;font-weight: bolder;white-space: nowrap;padding-left: 10px;">Sort by :</label> <a class="menuitem" href="/main/date/{{ filter }}/">Latest</a> <a class="menuitem" href="/main/pop/{{ filter }}/">Most Popular</a> <a class="menuitem" href="/main/vote/{{ filter }}/">Best Voted</a> <a class="menuitem" href="/main/recent/{{ filter }}/">Recently Active</a>
+{#</div>#}
+{#<div id="filterMenu">#}
+<div style="display:inline-block;position: absolute; left:600px;white-space: nowrap;" >
+    <label style="color: #1E4D6E;display: inline-block;font-size: 90%;font-weight: bolder;white-space: nowrap;">Filter by category :</label> <a class="menuitem" href="/main/{{ sort }}/til/">Today I Learned</a>  <a class="menuitem" href="/main/{{ sort }}/politics/">Politics</a> <a class="menuitem" href="/main/{{ sort }}/self/">Self Ask</a>  <a class="menuitem" href="/main/{{ sort }}/other/">Other</a> <a class="menuitem" href="/main/{{ sort }}/all/">All</a>
+</div>
+</div>
+    <div id="postMenu">
+            <div class="pagination" style="border-bottom: dotted 1px;">
+                <span class="step-links">
+                    {% if post_pages.has_previous %}
+                        <a href="?page={{ post_pages.previous_page_number }}">previous</a>
+                    {% endif %}
+
+                    <span class="current">
+                        Page {{ post_pages.number }} of {{ post_pages.paginator.num_pages }}.
+                    </span>
+
+                    {% if post_pages.has_next %}
+                        <a href="?page={{ post_pages.next_page_number }}">next</a>
+                    {% endif %}
+                </span>
+
+             </div>
+    
+        {% if result_count > -1 %} <span class="current">  {%if result_count %} {{ result_count }} {% else %} No {% endif %} item{% if result_count > 1 %}s{% endif %} found.  </span> {% endif %}
+   {% for aPost in post_pages.object_list %}
+        <div id="postMenuitem">
+            {% dict_entry_for_item aPost from vote_dict as vote %}
+            {% dict_entry_for_item aPost from score_dict as score %}
+            <table>
+                <tr>
+                    <td>
+                        <div style="width:5ex;" class="midcol unvoted">
+                            <div id="up_post_{{aPost.id}}" onclick="return rateItem('{{aPost.id}}','{% if vote and vote.is_upvote %}clear{% else %}up{% endif %}');"
+                                 class="arrow  up{% if vote and vote.is_upvote %}mod{% endif %} login-required"></div>
+                            <div id="post_{{aPost.id}}" class="score unvoted">{{ score.score|default:0 }}</div>
+                            <div id="down_post_{{aPost.id}}" onclick="return rateItem('{{aPost.id}}','{% if vote and vote.is_downvote %}clear{% else %}down{% endif %}');"
+                                 class="arrow down{% if vote and vote.is_downvote %}mod{% endif %} login-required"></div>
+                        </div>
+
+            </td>
+            <td>
+                    <a id="titleLink" href="/blog/page/{{ aPost.id }}/">{{ aPost.title }} </a><a style="text-decoration:none;"href="/profile/{{ aPost.author }}/">{{aPost.author }} </a> <span id="postDetails"> on : <b>{{ aPost.category }}</b> <i>{{ aPost.date_posted|humanizeTimeDiff }} ago</i><br/>
+                    <b>{{ aPost.postNumComments }}</b> Comments <a id="postLink" href="/blog/page/{{ aPost.id }}/">Read More</a></span>
+            </td>
+             </tr>
+             </table>
+        </div>
+    {% endfor %}
+            <div class="pagination">
+                <span class="step-links">
+                    {% if post_pages.has_previous %}
+                        <a href="?page={{ post_pages.previous_page_number }}">previous</a>
+                    {% endif %}
+
+                    <span class="current">
+                        Page {{ post_pages.number }} of {{ post_pages.paginator.num_pages }}.
+                    </span>
+
+                    {% if post_pages.has_next %}
+                        <a href="?page={{ post_pages.next_page_number }}">next</a>
+                    {% endif %}
+                </span>
+
+             </div>
+    </div>
+{% endblock %}

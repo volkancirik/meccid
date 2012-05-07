@@ -1,0 +1,70 @@
+description='Python client library for Freebase API service',
+maintainer_email='developers@freebase.com',
+url='http://www.freebase.com/',
+
+INSTALL:
+ 
+	/usr/bin/python setup.py install
+
+    When using freebase-python with Google AppEngine you will also need to
+    include the files in appengine_stubs with you AppEngine app.
+
+SYNOPSIS:
+
+	#!/usr/bin/python 
+
+	import freebase
+
+	query = {    'type':'/music/artist',
+	             'name':'Sting',
+	             'album':[],
+	         }
+	freebase.mqlread(query)
+	
+	for album in result.album:
+		print album
+
+   ----- OR -----
+	
+	#!/usr/bin/python
+	
+	from freebase import HTTPMetawebSession, MetawebError
+
+	mss = HTTPMetawebSession('www.freebase.com')
+
+	query = {    'type':'/music/artist',
+	             'name':'Sting',
+	             'album':[],
+	         }
+
+	result = mss.mqlread(query)
+
+	for album in result.album:
+	    print album
+
+TESTING:
+	
+	cd test
+	/usr/bin/python test_all.py -v
+
+	test_login (__main__.TestFreebase) ... ok
+	test_read (__main__.TestFreebase) ... ok
+	test_write (__main__.TestFreebase) ... ok
+	....
+	
+	----------------------------------------------------------------------
+	Ran 12 tests in 0.691s
+
+	OK
+
+freebase-api is now the standard python api for accessing freebase.
+metaweb-py has now been deprecated and can only be found in older
+releases of freebase-api.
+
+freebase-api is available under a simple 2-clause BSD-style license that
+should allow you to reuse this code in both open-source and
+commercial projects.
+
+If you have suggestions, bug fixes, or feature requests for either
+of these, please let one of the maintainers know or you can
+discuss it on the Freebase developers list.

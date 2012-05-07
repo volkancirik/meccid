@@ -1,0 +1,24 @@
+Metadata-Version: 1.0
+Name: freebase
+Version: 1.0.6
+Summary: Python client library for the freebase.com service
+Home-page: http://code.google.com/p/freebase-python/
+Author: Nick Thompson
+Author-email: developers@freebase.com
+License: BSD
+Description: A Python library providing a convenient
+        wrapper around the freebase.com service api, as well as some
+        utility functions helpful in writing clients of the api.
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Environment :: Console
+Classifier: Environment :: Web Environment
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Database :: Front-Ends
+Classifier: Topic :: Internet :: WWW/HTTP
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content
+Classifier: Topic :: Internet :: WWW/HTTP :: Dynamic Content :: CGI Tools/Libraries
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

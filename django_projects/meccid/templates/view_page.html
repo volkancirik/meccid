@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block icerik %}
+{% load comments %}
+{% load threadedcomments_tags %}
+{% load humanizeTimeDiff %}
+{% load youtubize %}
+{% load voting_tags %}
+{% load urlize_html %}
+
+{% votes_by_user user on base as vote_dict %}
+{% scores_for_objects base as score_dict %}
+
+{% votes_by_user user on postSet as vote_dict_post %}
+{% scores_for_objects postSet as score_dict_post %}
+
+<head><title>{{ post.title }}</title>
+
+{#    <div id="blogpost">#}
+
+        {% for postX in postSet %}
+        {% dict_entry_for_item postX from vote_dict_post as vote_post %}
+        {% dict_entry_for_item postX from score_dict_post as score_post %}
+        <div id="readPost">
+        <table>
+            <tr>
+                <td>
+
+                        <td>
+                            {% if imageID != "NULL" %}
+                            <a href="http://www.freebase.com/view/{{ imageID }}" target="_blank" ><img src="http://www.freebase.com/api/trans/raw/{{ imageID }}"  border="2" alt="Thumbnail" height="60" width="60" /></a>
+                            {% endif %}
+                        
+                         <div style="width:5ex;" class="midcol unvoted">
+                            <div id="up_post_{{postX.id}}" onclick="return rateItem('{{postX.id}}','{% if vote_post and vote_post.is_upvote %}clear{% else %}up{% endif %}');"
+                                 class="arrow  up{% if vote_post and vote_post.is_upvote %}mod{% endif %} login-required"></div>
+                            <div id="post_{{postX.id}}" class="score unvoted">{{ score_post.score|default:0 }}</div>
+                            <div id="down_post_{{postX.id}}" onclick="return rateItem('{{postX.id}}','{% if vote_post and vote_post.is_downvote %}clear{% else %}down{% endif %}');"
+                                 class="arrow down{% if vote_post and vote_post.is_downvote %}mod{% endif %} login-required"></div>
+                        </div>
+                        </td>
+
+                <td>
+            <b id="postTitle">{{ postX.title }}</b>
+            <div>{% autoescape off %}{{ postX.body|force_escape|linebreaks|urlize_html}}{% endautoescape %}<br> by <b><a style="text-decoration:none;"href="/profile/{{ postX.author  }}/">{{ postX.author }}</a></b> <span id="postDetails"><i>{{ postX.date_posted|humanizeTimeDiff }}</i> ago
+        <br>
+            <span id="contactLink">Click To Add Your Tags</span>
+
+            {% if tags|length > 0 %}
+            Tagged as
+                {% for tag in tags %}
+                    <a class="tagItem" href="http://freebase.com/view{{ tag.mid }}" target="_blank"> {{ tag.name  }}</a>
+                {% endfor %}
+
+            {% else %}
+                <span id="firstTagMessageI"><br></span>
+                <span id="firstTagMessage">Be the first Tagger!</span>
+            {% endif %}
+                <label id="dontForget">Do not Forget To Click Submit New Tags Button</label>
+                <span id="tags"></span>
+
+                <span id="firstTagMessage"><br></span>
+                <span id="firstTagMessage"><br></span>
+
+                 <div id="contactForm">
+                     <form id="postform" method="post" style="display:inline-block" action="/blog/page/{{ post.id }}/{{ post.author.id }}/{{ user.id }}/">
+                        <input type="text" id="tagblock" style="display:inline-block" name="keyword" maxlength="100" />
+                        <input type="submit" name="submit" style="display:inline-block" onclick="closeForm()" value="Submit New Tag(s)">
+                    </form>
+                 </div>
+             </td>
+         </tr>
+         </table>
+            <span id="replyOriginalLink"><b>Click to Reply</b></span>
+
+           {% with baslangic=base|first  %}
+                      <div id ="replyOriginal">
+                      <table>
+                        <form method="POST" style="width : 635px;" action="{% comment_form_target %}?next=/blog/userToUser/{{ post.id }}/{{ post.author }}/&page={{ post.title }}" >{% csrf_token %}
+                               {% get_comment_form for baslangic as form with baslangic.comment_ptr_id %}
+                               {% for field in form %}
+                    {#             {% if  field.name == 'name'  or field.name == 'comment'%}#}
+                                    {% if  field.name == 'comment'%}
+                                    <tr>
+                                       <td style="width:100%;" rows="20" cols="100">{{ field }} </td>
+                                    </tr>
+                                 {% endif %}
+                                 {% for hidden in form.hidden_fields %}
+                                     {{ hidden }}
+                                 {% endfor %}
+                               {% endfor %}
+                            <tr>
+                                <td>
+                                     <input type="submit" name="submit" value="Post">{% csrf_token %}
+                    {#                 <input type="submit" name="preview" value="Preview">{% csrf_token %}#}
+                                </td>
+                            </tr>
+                            <span id="replyOriginalmessageSent">Your tag has been added successfully!</span>
+                        </form>
+                      </table>
+                      </div>
+                      {% endwith %}
+        </div>
+        {% endfor %}
+
+    {% if base|length > 1%}
+        <h3>Comments on This Post:</h3>
+        {% for comment in base|fill_tree|annotate_tree %}
+            {% if comment != base|first  %}
+            <div id="threaded comment"style="margin-left: {{ comment.depth }}em;{% if comment.comment_ptr_id == latestTC %}border: 2px solid #000050; background: #9FBFDF; {% endif %}" class="comment">
+                {% dict_entry_for_item comment from vote_dict as vote %}
+                {% dict_entry_for_item comment from score_dict as score %}
+
+                    <table>
+                        <tr>
+                            <td>
+                               <div id="rootTC"style="width:5ex;" class="midcol unvoted">
+                                    <div id="up_tc_{{comment.comment_ptr_id}}" onclick="return rateTC('{{comment.comment_ptr_id}}','{% if vote and vote.is_upvote %}clear{% else %}up{% endif %}');"
+                                         class="arrow  up{% if vote and vote.is_upvote %}mod{% endif %} login-required"></div>
+                                    <div id="tc_{{comment.comment_ptr_id}}" class="score unvoted">{{ score.score|default:0 }}</div>
+                                    <div id="down_tc_{{comment.comment_ptr_id}}" onclick="return rateTC('{{comment.comment_ptr_id}}','{% if vote and vote.is_downvote %}clear{% else %}down{% endif %}');"
+                                         class="arrow down{% if vote and vote.is_downvote %}mod{% endif %} login-required"></div>
+                               </div>
+                            </td>
+                            <td>
+                                <div>
+                                        <b><a style="text-decoration:none;"href="/profile/{{ comment.name }}/">{{ comment.name }}</a></b> <i id="postDetails">commented {{ comment.submit_date|humanizeTimeDiff }}  ago</i>{% if comment.comment_ptr_id == latestTC %}<label style="margin-left:{{ comment.depth }}em;border: 1px solid #000050; background: #E0EAF1;color:#FF0000;border-radius: 3px 3px 3px 3px;font-weight: bolder;">The Most Recent Comment!</label>{% endif %}
+                                        {% autoescape off %}{{ comment.comment|force_escape|linebreaks|urlize_html }}{% endautoescape %}<span id="replyTCLink" onclick="openForm('{{ comment.comment_ptr_id }}')">Reply to this</span>
+
+                                {# <a href="/blog/page/{{ post.id }}/{{ comment.comment_ptr_id }}/" onclick="openForm('{{ comment.comment_ptr_id }}')">Reply to this</a>#}
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <div id="tcForm_{{comment.comment_ptr_id}}" class="replyTC">
+                        <form method="POST" action="{% comment_form_target %}?next=/blog/userToUser/{{ post.id }}/{{ post.author }}/&page={{ post.title }}" >{% csrf_token %}
+                         {% get_comment_form for comment as form with comment.comment_ptr_id %}
+                        {% for field in form %}
+{#             {% if  field.name == 'name'  or field.name == 'comment'%}#}
+                        {% if  field.name == 'comment'%}
+                          <tr>
+                             <td>{{ field }} </td>
+                          </tr>
+                       {% endif %}
+                       {% endfor %}
+
+                          {% for hidden in form.hidden_fields %}
+                             {{ hidden }}
+                          {% endfor %}
+                      <tr>
+                          <td>
+                         <input type="submit" name="submit" value="Post">{% csrf_token %}
+                        </td>
+                      </tr>
+                      </form>
+                    </div>
+            </div>
+        {% endif %}
+        {% endfor %}
+    <hr>
+    {% endif %}
+{% endblock %}
